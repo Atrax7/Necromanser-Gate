@@ -13,6 +13,11 @@ player_group = pygame.sprite.Group()
 sk_group = pygame.sprite.Group()
 playerr = 0
 
+health = 100
+lvlp = 1
+exp = 0
+power = 5
+
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -50,7 +55,6 @@ def start_screen():
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -60,6 +64,27 @@ def start_screen():
                 return
         pygame.display.flip()
         clock.tick(40)
+
+
+def lose_screen():
+    running = True
+    sp = pygame.sprite.Group()
+    curs = load_image("gameover.png")
+    gg = pygame.sprite.Sprite(sp)
+    gg.image = curs
+    gg.rect = gg.image.get_rect()
+    gg.rect.x = 0
+    gg.rect.y = 0
+    al = 0
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+        while al < 255:
+            gg.image.set_alpha(al + 1)
+            al += 1
+            sp.draw(screen)
+            pygame.display.flip()
 
 
 def rand_level():
@@ -169,7 +194,7 @@ while running:
             moves = pygame.key.get_pressed()
             if moves[pygame.K_w]:
                 if level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '/':
-                    pygame.quit()
+                    lose_screen()
                 elif level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '$':
                     for lt in sk:
                         lt.kill()
@@ -182,11 +207,11 @@ while running:
                     player.rect.y -= tile_height
                 for lt in sk:
                     if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                        pygame.quit()
+                        lose_screen()
 
             if moves[pygame.K_s]:
                 if level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '/':
-                    pygame.quit()
+                    lose_screen()
                 elif level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '$':
                     for lt in sk:
                         lt.kill()
@@ -199,11 +224,11 @@ while running:
                     player.rect.y += tile_height
                 for lt in sk:
                     if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                        pygame.quit()
+                        lose_screen()
 
             if moves[pygame.K_a]:
                 if level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '/':
-                    pygame.quit()
+                    lose_screen()
                 elif level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '$':
                     for lt in sk:
                         lt.kill()
@@ -217,11 +242,11 @@ while running:
                     player.rot(True)
                 for lt in sk:
                     if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                        pygame.quit()
+                        lose_screen()
 
             if moves[pygame.K_d]:
                 if level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '/':
-                    pygame.quit()
+                    lose_screen()
                 elif level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '$':
                     for lt in sk:
                         lt.kill()
@@ -235,7 +260,7 @@ while running:
                     player.rot(False)
                 for lt in sk:
                     if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                        pygame.quit()
+                        lose_screen()
             for lt in sk:
                 xx, yy = random.randint(-1, 1), random.randint(-1, 1)
                 while level[int(lt.rect.y / 64) + yy][int(lt.rect.x / 64) + xx] == '#' or \
@@ -244,7 +269,7 @@ while running:
                 lt.rect.x += xx * 64
                 lt.rect.y += yy * 64
                 if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                    pygame.quit()
+                    lose_screen()
 
     screen.fill((0, 0, 0))
     tiles_group.draw(screen)
