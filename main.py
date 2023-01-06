@@ -17,6 +17,7 @@ health = 100
 lvlp = 1
 exp = 0
 power = 5
+dang = 1
 
 
 def load_image(name, colorkey=None):
@@ -80,6 +81,9 @@ def lose_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                main_game()
         while al < 255:
             gg.image.set_alpha(al + 1)
             al += 1
@@ -173,107 +177,151 @@ class Skelet(pygame.sprite.Sprite):
             tile_width * pos_x, tile_height * pos_y)
         self.lf = True
 
-    def rot(self, s):
-        if s == True and self.lf == False:
-            self.image = pygame.transform.flip(self.image, True, False)
-            self.lf = True
-        elif s == False and self.lf == True:
-            self.image = pygame.transform.flip(self.image, True, False)
-            self.lf = False
+
+def fight():
+    global health, lvlp, exp, power
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                pass
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 30)
+        text1 = my_font.render(f'HP:{health}', True, (0, 255, 255))
+        text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
+        text3 = my_font.render(f'EXP:{exp}', True, (0, 255, 255))
+        text4 = my_font.render(f'POWER:{power}', True, (0, 255, 255))
+        screen.fill((0, 0, 0))
+        screen.blit(text1, (11, 11))
+        screen.blit(text2, (11, 44))
+        screen.blit(text3, (11, 77))
+        screen.blit(text4, (11, 110))
+        clock.tick(40)
+        pygame.display.flip()
 
 
-level = rand_level()
-player, sk, x, y, x1, y1 = generate_level(level)
-start_screen()
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            moves = pygame.key.get_pressed()
-            if moves[pygame.K_w]:
-                if level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '/':
-                    lose_screen()
-                elif level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '$':
-                    for lt in sk:
-                        lt.kill()
-                    screen.fill((0, 0, 0))
-                    level = rand_level()
-                    pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
-                    player.rect.x *= 64
-                    player.rect.y *= 64
-                elif not level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '#':
-                    player.rect.y -= tile_height
-                for lt in sk:
-                    if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                        lose_screen()
 
-            if moves[pygame.K_s]:
-                if level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '/':
-                    lose_screen()
-                elif level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '$':
-                    for lt in sk:
-                        lt.kill()
-                    screen.fill((0, 0, 0))
-                    level = rand_level()
-                    pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
-                    player.rect.x *= 64
-                    player.rect.y *= 64
-                elif not level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '#':
-                    player.rect.y += tile_height
-                for lt in sk:
-                    if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                        lose_screen()
-
-            if moves[pygame.K_a]:
-                if level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '/':
-                    lose_screen()
-                elif level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '$':
-                    for lt in sk:
-                        lt.kill()
-                    screen.fill((0, 0, 0))
-                    level = rand_level()
-                    pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
-                    player.rect.x *= 64
-                    player.rect.y *= 64
-                elif not level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '#':
-                    player.rect.x -= tile_width
-                    player.rot(True)
-                for lt in sk:
-                    if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                        lose_screen()
-
-            if moves[pygame.K_d]:
-                if level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '/':
-                    lose_screen()
-                elif level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '$':
-                    for lt in sk:
-                        lt.kill()
-                    screen.fill((0, 0, 0))
-                    level = rand_level()
-                    pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
-                    player.rect.x *= 64
-                    player.rect.y *= 64
-                elif not level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '#':
-                    player.rect.x += tile_width
-                    player.rot(False)
-                for lt in sk:
-                    if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                        lose_screen()
-            for lt in sk:
-                xx, yy = random.randint(-1, 1), random.randint(-1, 1)
-                while level[int(lt.rect.y / 64) + yy][int(lt.rect.x / 64) + xx] == '#' or \
-                        level[int(lt.rect.y / 64) + yy][int(lt.rect.x / 64) + xx] == '/' or (xx == 0 and yy == 0):
-                    xx, yy = random.randint(-1, 1), random.randint(-1, 1)
-                lt.rect.x += xx * 64
-                lt.rect.y += yy * 64
-                if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                    lose_screen()
-
+def main_game():
+    global playerr, health, lvlp, exp, power, all_sprites, tiles_group, player_group, sk_group, dang
+    all_sprites = pygame.sprite.Group()
+    tiles_group = pygame.sprite.Group()
+    player_group = pygame.sprite.Group()
+    sk_group = pygame.sprite.Group()
+    playerr = 0
+    health = 100
+    lvlp = 1
+    exp = 0
+    power = 5
     screen.fill((0, 0, 0))
-    tiles_group.draw(screen)
-    player_group.draw(screen)
-    clock.tick(40)
-    pygame.display.flip()
-pygame.quit()
+    my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 20)
+    level = rand_level()
+    player, sk, x, y, x1, y1 = generate_level(level)
+    start_screen()
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                moves = pygame.key.get_pressed()
+                if moves[pygame.K_w]:
+                    if level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '/':
+                        lose_screen()
+                    elif level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '$':
+                        dang += 1
+                        for lt in sk:
+                            lt.kill()
+                        screen.fill((0, 0, 0))
+                        level = rand_level()
+                        pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
+                        player.rect.x *= 64
+                        player.rect.y *= 64
+                    elif not level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '#':
+                        player.rect.y -= tile_height
+                    for lt in sk:
+                        if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
+                            fight()
+
+                if moves[pygame.K_s]:
+                    if level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '/':
+                        lose_screen()
+                    elif level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '$':
+                        dang += 1
+                        for lt in sk:
+                            lt.kill()
+                        screen.fill((0, 0, 0))
+                        level = rand_level()
+                        pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
+                        player.rect.x *= 64
+                        player.rect.y *= 64
+                    elif not level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '#':
+                        player.rect.y += tile_height
+                    for lt in sk:
+                        if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
+                            fight()
+
+                if moves[pygame.K_a]:
+                    if level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '/':
+                        lose_screen()
+                    elif level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '$':
+                        dang += 1
+                        for lt in sk:
+                            lt.kill()
+                        screen.fill((0, 0, 0))
+                        level = rand_level()
+                        pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
+                        player.rect.x *= 64
+                        player.rect.y *= 64
+                    elif not level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '#':
+                        player.rect.x -= tile_width
+                        player.rot(True)
+                    for lt in sk:
+                        if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
+                            fight()
+
+                if moves[pygame.K_d]:
+                    if level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '/':
+                        lose_screen()
+                    elif level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '$':
+                        dang += 1
+                        for lt in sk:
+                            lt.kill()
+                        screen.fill((0, 0, 0))
+                        level = rand_level()
+                        pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
+                        player.rect.x *= 64
+                        player.rect.y *= 64
+                    elif not level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '#':
+                        player.rect.x += tile_width
+                        player.rot(False)
+                    for lt in sk:
+                        if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
+                            fight()
+
+                for lt in sk:
+                    xx, yy = random.randint(-1, 1), random.randint(-1, 1)
+                    while level[int(lt.rect.y / 64) + yy][int(lt.rect.x / 64) + xx] == '#' or \
+                            level[int(lt.rect.y / 64) + yy][int(lt.rect.x / 64) + xx] == '/' or (xx == 0 and yy == 0):
+                        xx, yy = random.randint(-1, 1), random.randint(-1, 1)
+                    lt.rect.x += xx * 64
+                    lt.rect.y += yy * 64
+                    if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
+                        fight()
+
+        text1 = my_font.render(f'HP:{health}', True, (0, 255, 255))
+        text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
+        text3 = my_font.render(f'DANGEON:{dang}', True, (0, 255, 255))
+        screen.fill((0, 0, 0))
+        tiles_group.draw(screen)
+        player_group.draw(screen)
+        screen.blit(text1, (11, 11))
+        screen.blit(text2, (11, 44))
+        screen.blit(text3, (11, 77))
+        clock.tick(40)
+        pygame.display.flip()
+    pygame.quit()
+
+
+fight()
+main_game()
