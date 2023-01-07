@@ -18,6 +18,7 @@ lvlp = 1
 exp = 0
 power = 5
 dang = 1
+kills = 0
 
 
 def load_image(name, colorkey=None):
@@ -77,6 +78,10 @@ def lose_screen():
     gg.rect.x = 0
     gg.rect.y = 0
     al = 0
+    my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
+    text1 = my_font.render(f'DANGEON:{dang}', True, (0, 255, 255))
+    text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
+    text3 = my_font.render(f'KILLS:{kills}', True, (0, 255, 255))
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -88,10 +93,16 @@ def lose_screen():
             gg.image.set_alpha(al + 1)
             al += 1
             sp.draw(screen)
+            screen.blit(text1, (550, 600))
+            screen.blit(text2, (550, 660))
+            screen.blit(text3, (550, 720))
             pygame.display.flip()
 
 
 def rand_level():
+    global exp
+    exp += 1
+    LevelUp()
     lvl = random.choice(('map.txt', 'map1.txt', 'map2.txt', 'map3.txt', 'map4.txt'))
     return load_level(lvl)
 
@@ -188,7 +199,7 @@ def LevelUp():
 
 
 def fight():
-    global health, lvlp, exp, power
+    global health, lvlp, exp, power, kills
     sk_h = 20
     defend = 0
     running = True
@@ -218,6 +229,7 @@ def fight():
         if health <= 0:
             return 0
         if sk_h <= 0:
+            kills += 1
             exp += 4
             LevelUp()
             return 1
