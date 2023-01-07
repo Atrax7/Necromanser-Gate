@@ -178,8 +178,19 @@ class Skelet(pygame.sprite.Sprite):
         self.lf = True
 
 
+def LevelUp():
+    global exp, lvlp, health, power
+    if exp >= lvlp * 5:
+        exp = 0
+        health += 30 * lvlp
+        lvlp += 1
+        power += 2
+
+
 def fight():
     global health, lvlp, exp, power
+    sk_h = 20
+    defend = 0
     running = True
     while running:
         for event in pygame.event.get():
@@ -187,19 +198,52 @@ def fight():
                 running = False
             if event.type == pygame.KEYDOWN:
                 pass
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed()[0]:
+                    if 300 < event.pos[0] < 450 and 800 < event.pos[1] < 875:
+                        sk_h -= random.randint(0, power)
+                        health -= random.randint(0, 7 - defend)
+                        defend -= 1
+                    if 550 < event.pos[0] < 700 and 800 < event.pos[1] < 875:
+                        defend = lvlp
+                        health -= random.randint(0, 7 - defend)
+                        defend -= 1
+                    if 800 < event.pos[0] < 950 and 800 < event.pos[1] < 875:
+                        if random.randint(0, 3) == 1:
+                            return 2
+                        health -= random.randint(0, 7 - defend)
+                        defend -= 1
+                    if defend < 0:
+                        defend = 0
+        if health <= 0:
+            return 0
+        if sk_h <= 0:
+            exp += 4
+            LevelUp()
+            return 1
         my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 30)
         text1 = my_font.render(f'HP:{health}', True, (0, 255, 255))
         text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
         text3 = my_font.render(f'EXP:{exp}', True, (0, 255, 255))
         text4 = my_font.render(f'POWER:{power}', True, (0, 255, 255))
+        text5 = my_font.render(f'SKELET:{sk_h} / 20', True, (0, 255, 255))
         screen.fill((0, 0, 0))
-        screen.blit(text1, (11, 11))
-        screen.blit(text2, (11, 44))
-        screen.blit(text3, (11, 77))
-        screen.blit(text4, (11, 110))
+        pygame.draw.rect(screen, (0, 255, 255), (150, 600, 980, 300), 10)
+        sk = load_image('skelet-f.png')
+        screen.blit(sk, (525, 300))
+        but1 = load_image('fight.png')
+        screen.blit(but1, (300, 800))
+        but2 = load_image('def.png')
+        screen.blit(but2, (550, 800))
+        but3 = load_image('escape.png')
+        screen.blit(but3, (800, 800))
+        screen.blit(text1, (200, 620))
+        screen.blit(text2, (420, 620))
+        screen.blit(text3, (640, 620))
+        screen.blit(text4, (860, 620))
+        screen.blit(text5, (530, 170))
         clock.tick(40)
         pygame.display.flip()
-
 
 
 def main_game():
@@ -241,7 +285,12 @@ def main_game():
                         player.rect.y -= tile_height
                     for lt in sk:
                         if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                            fight()
+                            res = fight()
+                            if res == 1:
+                                lt.kill()
+                                sk.remove(lt)
+                            elif res == 0:
+                                lose_screen()
 
                 if moves[pygame.K_s]:
                     if level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '/':
@@ -259,7 +308,12 @@ def main_game():
                         player.rect.y += tile_height
                     for lt in sk:
                         if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                            fight()
+                            res = fight()
+                            if res == 1:
+                                lt.kill()
+                                sk.remove(lt)
+                            elif res == 0:
+                                lose_screen()
 
                 if moves[pygame.K_a]:
                     if level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '/':
@@ -278,7 +332,12 @@ def main_game():
                         player.rot(True)
                     for lt in sk:
                         if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                            fight()
+                            res = fight()
+                            if res == 1:
+                                lt.kill()
+                                sk.remove(lt)
+                            elif res == 0:
+                                lose_screen()
 
                 if moves[pygame.K_d]:
                     if level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '/':
@@ -297,7 +356,12 @@ def main_game():
                         player.rot(False)
                     for lt in sk:
                         if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                            fight()
+                            res = fight()
+                            if res == 1:
+                                lt.kill()
+                                sk.remove(lt)
+                            elif res == 0:
+                                lose_screen()
 
                 for lt in sk:
                     xx, yy = random.randint(-1, 1), random.randint(-1, 1)
@@ -307,7 +371,12 @@ def main_game():
                     lt.rect.x += xx * 64
                     lt.rect.y += yy * 64
                     if lt.rect.x == player.rect.x and lt.rect.y == player.rect.y:
-                        fight()
+                        res = fight()
+                        if res == 1:
+                            lt.kill()
+                            sk.remove(lt)
+                        elif res == 0:
+                            lose_screen()
 
         text1 = my_font.render(f'HP:{health}', True, (0, 255, 255))
         text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
@@ -323,5 +392,4 @@ def main_game():
     pygame.quit()
 
 
-fight()
 main_game()
