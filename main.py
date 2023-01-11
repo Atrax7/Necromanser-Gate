@@ -2,6 +2,7 @@ import os
 import sys
 import pygame
 import random
+import dtb
 
 pygame.init()
 size = width, height = 1280, 960
@@ -43,29 +44,36 @@ def terminate():
 
 
 def start_screen():
-    intro_text = ["Necromancer gate"]
-
-    fon = pygame.transform.scale(load_image('fon.png'), (width, height))
-    screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 50
-    for line in intro_text:
-        string_rendered = font.render(line, True, pygame.Color('white'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
-    while True:
+    running = True
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            elif event.type == pygame.KEYDOWN or \
-                    event.type == pygame.MOUSEBUTTONDOWN:
-                return
-        pygame.display.flip()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed()[0]:
+                    if 500 < event.pos[0] < 800 and 300 < event.pos[1] < 450:
+                        main_game()
+                    if 500 < event.pos[0] < 800 and 500 < event.pos[1] < 650:
+                        print(1)
+                    if 60 < event.pos[0] < 210 and 730 < event.pos[1] < 880:
+                        print(1)
+                    if 500 < event.pos[0] < 800 and 700 < event.pos[1] < 850:
+                        terminate()
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60)
+        text1 = my_font.render(f'NECROMANCER GATE', True, (0, 255, 255))
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+        but1 = load_image('play.png')
+        screen.blit(but1, (500, 300))
+        but2 = load_image('stat.png')
+        screen.blit(but2, (500, 500))
+        but3 = load_image('exit.png')
+        screen.blit(but3, (500, 700))
+        but4 = load_image('prof.png')
+        screen.blit(but4, (60, 730))
+        screen.blit(text1, (300, 100))
         clock.tick(40)
+        pygame.display.flip()
 
 
 def lose_screen():
@@ -88,7 +96,7 @@ def lose_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                main_game()
+                start_screen()
         while al < 255:
             gg.image.set_alpha(al + 1)
             al += 1
@@ -206,9 +214,7 @@ def fight():
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN:
-                pass
+                terminate()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     if 300 < event.pos[0] < 450 and 800 < event.pos[1] < 875:
@@ -273,7 +279,6 @@ def main_game():
     my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 20)
     level = rand_level()
     player, sk, x, y, x1, y1 = generate_level(level)
-    start_screen()
     running = True
     while running:
         for event in pygame.event.get():
@@ -404,4 +409,4 @@ def main_game():
     pygame.quit()
 
 
-main_game()
+start_screen()
