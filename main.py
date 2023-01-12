@@ -2,7 +2,6 @@ import os
 import sys
 import pygame
 import random
-import dtb
 
 pygame.init()
 size = width, height = 1280, 960
@@ -44,6 +43,14 @@ def terminate():
 
 
 def start_screen():
+    global playerr, health, lvlp, exp, power, dang, kills
+    playerr = 0
+    health = 100
+    lvlp = 1
+    exp = 0
+    power = 5
+    dang = 1
+    kills = 0
     running = True
     while running:
         for event in pygame.event.get():
@@ -108,10 +115,12 @@ def lose_screen():
 
 
 def rand_level():
-    global exp
+    global exp, dang
     exp += 1
     LevelUp()
     lvl = random.choice(('map.txt', 'map1.txt', 'map2.txt', 'map3.txt', 'map4.txt'))
+    if dang % 5 == 0:
+        lvl = 'map5.txt'
     return load_level(lvl)
 
 
@@ -219,7 +228,7 @@ def fight():
                 if pygame.mouse.get_pressed()[0]:
                     if 300 < event.pos[0] < 450 and 800 < event.pos[1] < 875:
                         sk_h -= random.randint(0, power)
-                        health -= random.randint(0, 7 - defend)
+                        health -= random.randint(0, 6 - defend + int(lvlp * 1.5))
                         defend -= 1
                     if 550 < event.pos[0] < 700 and 800 < event.pos[1] < 875:
                         defend = lvlp
@@ -228,7 +237,7 @@ def fight():
                     if 800 < event.pos[0] < 950 and 800 < event.pos[1] < 875:
                         if random.randint(0, 3) == 1:
                             return 2
-                        health -= random.randint(0, 7 - defend)
+                        health -= random.randint(0, 6 - defend + int(lvlp * 1.5))
                         defend -= 1
                     if defend < 0:
                         defend = 0
