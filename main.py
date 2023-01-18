@@ -157,6 +157,9 @@ def generate_level(level):
             elif level[y][x] == 's':
                 Tile('empty', x, y)
                 new_sk.append(Skelet(x, y))
+            elif level[y][x] == 'b':
+                Tile('empty', x, y)
+                new_sk.append(Skeletb(x, y))
     return new_player, new_sk, x, y, x1, y1
 
 
@@ -167,6 +170,7 @@ tile_images = {
     'portal': load_image('fire.png')
 }
 sk_image = load_image('skelet.png')
+skb_image = load_image('skelet_b.png')
 player_image = load_image('ggs.png')
 
 tile_width = tile_height = 64
@@ -206,6 +210,15 @@ class Skelet(pygame.sprite.Sprite):
         self.lf = True
 
 
+class Skeletb(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(player_group, all_sprites)
+        self.image = skb_image
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.lf = True
+
+
 def LevelUp():
     global exp, lvlp, health, power
     if exp >= lvlp * 5:
@@ -216,7 +229,9 @@ def LevelUp():
 
 
 def fight():
-    global health, lvlp, exp, power, kills
+    global health, lvlp, exp, power, kills, dang
+    if dang % 5 == 0:
+        return fight_b()
     sk_h = 20
     defend = 0
     running = True
@@ -257,6 +272,64 @@ def fight():
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (150, 600, 980, 300), 10)
         sk = load_image('skelet-f.png')
+        screen.blit(sk, (525, 300))
+        but1 = load_image('fight.png')
+        screen.blit(but1, (300, 800))
+        but2 = load_image('def.png')
+        screen.blit(but2, (550, 800))
+        but3 = load_image('escape.png')
+        screen.blit(but3, (800, 800))
+        screen.blit(text1, (200, 620))
+        screen.blit(text2, (420, 620))
+        screen.blit(text3, (640, 620))
+        screen.blit(text4, (860, 620))
+        screen.blit(text5, (530, 170))
+        clock.tick(40)
+        pygame.display.flip()
+
+
+def fight_b():
+    global health, lvlp, exp, power, kills, dang
+    sk_h = 10 * lvlp
+    defend = 0
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed()[0]:
+                    if 300 < event.pos[0] < 450 and 800 < event.pos[1] < 875:
+                        sk_h -= random.randint(0, power)
+                        health -= random.randint(0, 8 - defend + int(lvlp * 2))
+                        defend -= 1
+                    if 550 < event.pos[0] < 700 and 800 < event.pos[1] < 875:
+                        defend = lvlp
+                        health -= random.randint(0, 9 - defend)
+                        defend -= 1
+                    if 800 < event.pos[0] < 950 and 800 < event.pos[1] < 875:
+                        if random.randint(0, 5) == 1:
+                            return 2
+                        health -= random.randint(0, 8 - defend + int(lvlp * 2))
+                        defend -= 1
+                    if defend < 0:
+                        defend = 0
+        if health <= 0:
+            return 0
+        if sk_h <= 0:
+            kills += 1
+            exp += 6 * (dang / 5)
+            LevelUp()
+            return 1
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 30)
+        text1 = my_font.render(f'HP:{health}', True, (0, 255, 255))
+        text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
+        text3 = my_font.render(f'EXP:{exp}', True, (0, 255, 255))
+        text4 = my_font.render(f'POWER:{power}', True, (0, 255, 255))
+        text5 = my_font.render(f'SKELET:{sk_h} / {10 * lvlp}', True, (0, 255, 255))
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, (0, 255, 255), (150, 600, 980, 300), 10)
+        sk = load_image('skelet-bf.png')
         screen.blit(sk, (525, 300))
         but1 = load_image('fight.png')
         screen.blit(but1, (300, 800))
