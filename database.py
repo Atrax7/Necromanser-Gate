@@ -29,7 +29,7 @@ class DataBase:
     def register(self, nickname, password):
         result = self.request("SELECT nickname FROM accounts WHERE nickname = ?", params=[nickname])
         if len(result) != 0:
-            return 'Данный никнейм занят!'
+            return 0
         self.request("INSERT INTO accounts (nickname, password) VALUES (?, ?)", params=[nickname, password],
                             commit=True)
         self.nickname = nickname
@@ -39,9 +39,14 @@ class DataBase:
         result = self.request("SELECT nickname FROM accounts WHERE nickname = ? AND password = ?",
                               params=[nickname, password])
         if len(result) == 0:
-            return 'Неверный логин или пароль!'
+            return 0
         else:
             self.nickname = nickname
+        return True
+
+    def changepassword(self, newpassword):
+        self.request("UPDATE accounts SET password = ?",
+                              params=[newpassword])
         return True
 
     def save_result(self, xp, lvl, kills, floor):
