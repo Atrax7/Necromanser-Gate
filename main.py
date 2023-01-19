@@ -42,15 +42,40 @@ def terminate():
     sys.exit()
 
 
+def res_but():
+    global playerr, health, lvlp, exp, power, dang, kills
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed()[0]:
+                    if 920 < event.pos[0] < 1220 and 730 < event.pos[1] < 880:
+                        return
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60)
+        text1 = my_font.render(f'NECROMANCER GATE', True, (0, 255, 255))
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50)
+        text2 = my_font.render(f'STATISTICS:', True, (0, 255, 255))
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
+        text3 = my_font.render(f'Atrax         DANGEON:10   LEVEL:9   KILL:99', True, (0, 255, 255))
+        text4 = my_font.render(f'Strabelial  DANGEON:7    LEVEL:5   KILL:44', True, (0, 255, 255))
+        text5 = my_font.render(f'Frimin        DANGEON:4    LEVEL:1   KILL:10', True, (0, 255, 255))
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+        but3 = load_image('exit.png')
+        screen.blit(but3, (920, 730))
+        screen.blit(text1, (300, 100))
+        screen.blit(text2, (100, 200))
+        screen.blit(text3, (100, 300))
+        screen.blit(text4, (100, 400))
+        screen.blit(text5, (100, 500))
+        clock.tick(40)
+        pygame.display.flip()
+
+
 def start_screen():
     global playerr, health, lvlp, exp, power, dang, kills
-    playerr = 0
-    health = 100
-    lvlp = 1
-    exp = 0
-    power = 5
-    dang = 1
-    kills = 0
     running = True
     while running:
         for event in pygame.event.get():
@@ -59,9 +84,16 @@ def start_screen():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     if 500 < event.pos[0] < 800 and 300 < event.pos[1] < 450:
+                        playerr = 0
+                        health = 100
+                        lvlp = 1
+                        exp = 0
+                        power = 5
+                        dang = 1
+                        kills = 0
                         main_game()
                     if 500 < event.pos[0] < 800 and 500 < event.pos[1] < 650:
-                        print(1)
+                        res_but()
                     if 60 < event.pos[0] < 210 and 730 < event.pos[1] < 880:
                         print(1)
                     if 500 < event.pos[0] < 800 and 700 < event.pos[1] < 850:
@@ -103,6 +135,7 @@ def lose_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
+                pygame.mixer.music.pause()
                 start_screen()
         while al < 255:
             gg.image.set_alpha(al + 1)
@@ -362,6 +395,8 @@ def main_game():
     level = rand_level()
     player, sk, x, y, x1, y1 = generate_level(level)
     running = True
+    pygame.mixer.music.load("data/castle.mp3")
+    pygame.mixer.music.play(-1)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
