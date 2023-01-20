@@ -42,6 +42,89 @@ def terminate():
     sys.exit()
 
 
+def akk_but():
+    clock = pygame.time.Clock()
+    input_box = pygame.Rect(520, 530, 500, 100)
+    input_box1 = pygame.Rect(520, 380, 500, 100)
+    color_inactive = pygame.Color(0, 255, 255)
+    color_active = pygame.Color(200, 255, 255)
+    color_inactive1 = pygame.Color(0, 255, 255)
+    color_active1 = pygame.Color(200, 255, 255)
+    color = color_inactive
+    color1 = color_inactive
+    active = False
+    active1 = False
+    text = ''
+    text_1 = ''
+    run = False
+    while not run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed()[0]:
+                    if 920 < event.pos[0] < 1220 and 730 < event.pos[1] < 880:
+                        return
+                if input_box.collidepoint(event.pos):
+                    active = not active
+                else:
+                    active = False
+                color = color_active if active else color_inactive
+
+                if input_box1.collidepoint(event.pos):
+                    active1 = not active1
+                else:
+                    active1 = False
+                color1 = color_active1 if active1 else color_inactive1
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_RETURN:
+                        print(text)
+                        text = ''
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        if len(text) > 11:
+                            event.unicode = ''
+                        text += event.unicode
+
+                if active1:
+                    if event.key == pygame.K_RETURN:
+                        print(text_1)
+                        text_1 = ''
+                    elif event.key == pygame.K_BACKSPACE:
+                        text_1 = text_1[:-1]
+                    else:
+                        if len(text_1) > 11:
+                            event.unicode = ''
+                        text_1 += event.unicode
+
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60)
+        text1 = my_font.render(f'NECROMANCER GATE', True, (0, 255, 255))
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50)
+        text2 = my_font.render(f'SIGN IN:', True, (0, 255, 255))
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
+        text3 = my_font.render(f'USERNAME:', True, (0, 255, 255))
+        text4 = my_font.render(f'PASSWORD:', True, (0, 255, 255))
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+        but3 = load_image('exit.png')
+        screen.blit(but3, (920, 730))
+        screen.blit(text1, (300, 100))
+        screen.blit(text2, (550, 250))
+        screen.blit(text3, (250, 400))
+        screen.blit(text4, (250, 550))
+        txt_surface = my_font.render(text, True, (0, 255, 255))
+        screen.blit(txt_surface, (input_box.x + 15, input_box.y + 15))
+        txt_surface = my_font.render(text_1, True, (0, 255, 255))
+        screen.blit(txt_surface, (input_box1.x + 15, input_box1.y + 15))
+        pygame.draw.rect(screen, color, input_box, 10)
+        pygame.draw.rect(screen, color1, input_box1, 10)
+
+        pygame.display.flip()
+        clock.tick(30)
+
+
 def res_but():
     global playerr, health, lvlp, exp, power, dang, kills
     running = True
@@ -95,7 +178,7 @@ def start_screen():
                     if 500 < event.pos[0] < 800 and 500 < event.pos[1] < 650:
                         res_but()
                     if 60 < event.pos[0] < 210 and 730 < event.pos[1] < 880:
-                        print(1)
+                        akk_but()
                     if 500 < event.pos[0] < 800 and 700 < event.pos[1] < 850:
                         terminate()
         my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60)
@@ -426,7 +509,7 @@ def main_game():
                             elif res == 0:
                                 lose_screen()
 
-                if moves[pygame.K_s]:
+                elif moves[pygame.K_s]:
                     if level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '/':
                         lose_screen()
                     elif level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '$':
@@ -449,7 +532,7 @@ def main_game():
                             elif res == 0:
                                 lose_screen()
 
-                if moves[pygame.K_a]:
+                elif moves[pygame.K_a]:
                     if level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '/':
                         lose_screen()
                     elif level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '$':
@@ -473,7 +556,7 @@ def main_game():
                             elif res == 0:
                                 lose_screen()
 
-                if moves[pygame.K_d]:
+                elif moves[pygame.K_d]:
                     if level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '/':
                         lose_screen()
                     elif level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '$':
@@ -496,6 +579,8 @@ def main_game():
                                 sk.remove(lt)
                             elif res == 0:
                                 lose_screen()
+                else:
+                    break
 
                 for lt in sk:
                     xx, yy = random.randint(-1, 1), random.randint(-1, 1)
