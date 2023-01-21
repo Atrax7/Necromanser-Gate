@@ -1,5 +1,5 @@
 			
-			Necromancer`s Gate - рогалик на Python. 
+			Necromancer Gate - рогалик на Python. 
 
 Возможности:
 • Несколько уровней, меняющихся в случайном порядке.

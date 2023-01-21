@@ -150,18 +150,30 @@ def res_but():
         my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50)
         text2 = my_font.render(f'STATISTICS:', True, (0, 255, 255))
         my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
-        if len(database.DataBase.get_top(akk)) < 5:
-            return
-        text3 = my_font.render(f'{database.DataBase.get_top(akk)[0][0]}   LEVEL:{database.DataBase.get_top(akk)[0][1]}',
-                               True, (0, 255, 255))
-        text4 = my_font.render(f'{database.DataBase.get_top(akk)[1][0]}   LEVEL:{database.DataBase.get_top(akk)[1][1]}',
-                               True, (0, 255, 255))
-        text5 = my_font.render(f'{database.DataBase.get_top(akk)[2][0]}   LEVEL:{database.DataBase.get_top(akk)[2][1]}',
-                               True, (0, 255, 255))
-        text6 = my_font.render(f'{database.DataBase.get_top(akk)[3][0]}   LEVEL:{database.DataBase.get_top(akk)[3][1]}',
-                               True, (0, 255, 255))
-        text7 = my_font.render(f'{database.DataBase.get_top(akk)[4][0]}   LEVEL:{database.DataBase.get_top(akk)[4][1]}',
-                               True, (0, 255, 255))
+        top = akk.get_top()
+
+        emptytext = my_font.render(f'-', True, (0, 255, 255))
+
+        text3 = emptytext
+        text4 = emptytext
+        text5 = emptytext
+        text6 = emptytext
+        text7 = emptytext
+
+        if top[0][1] != '0':
+            text3 = my_font.render(f'{top[0][0]}   LEVEL:{top[0][1]}', True, (0, 255, 255))
+
+        if len(top) >= 2:
+            text4 = my_font.render(f'{top[1][0]}   LEVEL:{top[1][1]}', True, (0, 255, 255))
+
+        if len(top) >= 3:
+            text5 = my_font.render(f'{top[2][0]}   LEVEL:{top[2][1]}', True, (0, 255, 255))
+
+        if len(top) >= 4:
+            text6 = my_font.render(f'{top[3][0]}   LEVEL:{top[3][1]}', True, (0, 255, 255))
+
+        if len(top) >= 5:
+            text7 = my_font.render(f'{top[4][0]}   LEVEL:{top[4][1]}', True, (0, 255, 255))
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
         but3 = load_image('exit.png')
@@ -181,6 +193,8 @@ def res_but():
 
 def start_screen():
     global playerr, health, lvlp, exp, power, dang, kills
+    pygame.display.set_icon(player_image)
+    pygame.display.set_caption('Necromancer Gate')
     running = True
     while running:
         for event in pygame.event.get():

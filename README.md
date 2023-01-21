@@ -1,4 +1,4 @@
-# Necromancer`s Gate
+# Necromancer Gate
 ### Рогалик на Python
 
 #### Возможности:
