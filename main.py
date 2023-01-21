@@ -21,6 +21,7 @@ power = 5
 dang = 1
 kills = 0
 akk = database.DataBase()
+pygame.mouse.set_visible(False)
 
 
 def load_image(name, colorkey=None):
@@ -127,9 +128,10 @@ def akk_but():
         screen.blit(txt_surface, (input_box1.x + 15, input_box1.y + 15))
         pygame.draw.rect(screen, color, input_box, 10)
         pygame.draw.rect(screen, color1, input_box1, 10)
-
+        cursor = load_image('curs.png')
+        screen.blit(cursor, pygame.mouse.get_pos())
         pygame.display.flip()
-        clock.tick(30)
+        clock.tick(60)
 
 
 def res_but():
@@ -171,7 +173,9 @@ def res_but():
         screen.blit(text5, (100, 500))
         screen.blit(text6, (100, 600))
         screen.blit(text7, (100, 700))
-        clock.tick(40)
+        cursor = load_image('curs.png')
+        screen.blit(cursor, pygame.mouse.get_pos())
+        clock.tick(60)
         pygame.display.flip()
 
 
@@ -212,7 +216,10 @@ def start_screen():
         but4 = load_image('prof.png')
         screen.blit(but4, (60, 730))
         screen.blit(text1, (300, 100))
-        clock.tick(40)
+        pygame.mouse.set_visible(False)
+        cursor = load_image('curs.png')
+        screen.blit(cursor, pygame.mouse.get_pos())
+        clock.tick(60)
         pygame.display.flip()
 
 
@@ -361,6 +368,20 @@ def LevelUp():
         health += 30 * lvlp
         lvlp += 1
         power += 2
+        running = True
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 80)
+        text1 = my_font.render(f'*LEVEL UP*', True, (0, 255, 255))
+        database.DataBase.save_result(akk, exp, lvlp, kills, dang)
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    terminate()
+                elif event.type == pygame.KEYDOWN or \
+                        event.type == pygame.MOUSEBUTTONDOWN:
+                    return
+            screen.blit(text1, (400, 40))
+            clock.tick(60)
+            pygame.display.flip()
 
 
 def fight():
@@ -378,16 +399,16 @@ def fight():
                 if pygame.mouse.get_pressed()[0]:
                     if 300 < event.pos[0] < 450 and 800 < event.pos[1] < 875:
                         sk_h -= random.randint(0, power)
-                        health -= random.randint(0, 6 - defend + int(lvlp * 1.5))
+                        health -= random.randint(0, 6 - defend + int(lvlp * 1.7))
                         defend -= 1
                     if 550 < event.pos[0] < 700 and 800 < event.pos[1] < 875:
                         defend = lvlp
-                        health -= random.randint(0, 7 - defend)
+                        health -= random.randint(0, 7 - defend + int(lvlp * 1.7))
                         defend -= 1
                     if 800 < event.pos[0] < 950 and 800 < event.pos[1] < 875:
                         if random.randint(0, 3) == 1:
                             return 2
-                        health -= random.randint(0, 6 - defend + int(lvlp * 1.5))
+                        health -= random.randint(0, 6 - defend + int(lvlp * 1.7))
                         defend -= 1
                     if defend < 0:
                         defend = 0
@@ -419,13 +440,16 @@ def fight():
         screen.blit(text3, (640, 620))
         screen.blit(text4, (860, 620))
         screen.blit(text5, (530, 170))
-        clock.tick(40)
+        pygame.mouse.set_visible(False)
+        cursor = load_image('curs.png')
+        screen.blit(cursor, pygame.mouse.get_pos())
+        clock.tick(60)
         pygame.display.flip()
 
 
 def fight_b():
     global health, lvlp, exp, power, kills, dang
-    sk_h = 10 * lvlp
+    sk_h = 10 * lvlp * (dang / 5)
     defend = 0
     running = True
     while running:
@@ -440,7 +464,7 @@ def fight_b():
                         defend -= 1
                     if 550 < event.pos[0] < 700 and 800 < event.pos[1] < 875:
                         defend = lvlp
-                        health -= random.randint(0, 9 - defend)
+                        health -= random.randint(0, 9 - defend + int(lvlp * 2))
                         defend -= 1
                     if 800 < event.pos[0] < 950 and 800 < event.pos[1] < 875:
                         if random.randint(0, 5) == 1:
@@ -477,7 +501,10 @@ def fight_b():
         screen.blit(text3, (640, 620))
         screen.blit(text4, (860, 620))
         screen.blit(text5, (530, 170))
-        clock.tick(40)
+        pygame.mouse.set_visible(False)
+        cursor = load_image('curs.png')
+        screen.blit(cursor, pygame.mouse.get_pos())
+        clock.tick(60)
         pygame.display.flip()
 
 
@@ -625,7 +652,10 @@ def main_game():
         screen.blit(text1, (11, 11))
         screen.blit(text2, (11, 44))
         screen.blit(text3, (11, 77))
-        clock.tick(40)
+        pygame.mouse.set_visible(False)
+        cursor = load_image('curs.png')
+        screen.blit(cursor, pygame.mouse.get_pos())
+        clock.tick(60)
         pygame.display.flip()
     pygame.quit()
 
