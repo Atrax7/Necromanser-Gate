@@ -2,6 +2,7 @@ import os
 import sys
 import pygame
 import random
+import database
 
 pygame.init()
 size = width, height = 1280, 960
@@ -19,6 +20,7 @@ exp = 0
 power = 5
 dang = 1
 kills = 0
+akk = database.DataBase()
 
 
 def load_image(name, colorkey=None):
@@ -65,6 +67,9 @@ def akk_but():
                 if pygame.mouse.get_pressed()[0]:
                     if 920 < event.pos[0] < 1220 and 730 < event.pos[1] < 880:
                         return
+                    if 750 < event.pos[0] < 900 and 730 < event.pos[1] < 880:
+                        if database.DataBase.login(akk, text_1, text):
+                            return
                 if input_box.collidepoint(event.pos):
                     active = not active
                 else:
@@ -108,8 +113,10 @@ def akk_but():
         text4 = my_font.render(f'PASSWORD:', True, (0, 255, 255))
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
-        but3 = load_image('exit.png')
-        screen.blit(but3, (920, 730))
+        but1 = load_image('exit.png')
+        but2 = load_image('ok.png')
+        screen.blit(but1, (920, 730))
+        screen.blit(but2, (750, 730))
         screen.blit(text1, (300, 100))
         screen.blit(text2, (550, 250))
         screen.blit(text3, (250, 400))
@@ -141,9 +148,18 @@ def res_but():
         my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50)
         text2 = my_font.render(f'STATISTICS:', True, (0, 255, 255))
         my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
-        text3 = my_font.render(f'Atrax         DANGEON:10   LEVEL:9   KILL:99', True, (0, 255, 255))
-        text4 = my_font.render(f'Strabelial  DANGEON:7    LEVEL:5   KILL:44', True, (0, 255, 255))
-        text5 = my_font.render(f'Frimin        DANGEON:4    LEVEL:1   KILL:10', True, (0, 255, 255))
+        if len(database.DataBase.get_top(akk)) < 5:
+            return
+        text3 = my_font.render(f'{database.DataBase.get_top(akk)[0][0]}   LEVEL:{database.DataBase.get_top(akk)[0][1]}',
+                               True, (0, 255, 255))
+        text4 = my_font.render(f'{database.DataBase.get_top(akk)[1][0]}   LEVEL:{database.DataBase.get_top(akk)[1][1]}',
+                               True, (0, 255, 255))
+        text5 = my_font.render(f'{database.DataBase.get_top(akk)[2][0]}   LEVEL:{database.DataBase.get_top(akk)[2][1]}',
+                               True, (0, 255, 255))
+        text6 = my_font.render(f'{database.DataBase.get_top(akk)[3][0]}   LEVEL:{database.DataBase.get_top(akk)[3][1]}',
+                               True, (0, 255, 255))
+        text7 = my_font.render(f'{database.DataBase.get_top(akk)[4][0]}   LEVEL:{database.DataBase.get_top(akk)[4][1]}',
+                               True, (0, 255, 255))
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
         but3 = load_image('exit.png')
@@ -153,6 +169,8 @@ def res_but():
         screen.blit(text3, (100, 300))
         screen.blit(text4, (100, 400))
         screen.blit(text5, (100, 500))
+        screen.blit(text6, (100, 600))
+        screen.blit(text7, (100, 700))
         clock.tick(40)
         pygame.display.flip()
 
@@ -212,6 +230,7 @@ def lose_screen():
     text1 = my_font.render(f'DANGEON:{dang}', True, (0, 255, 255))
     text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
     text3 = my_font.render(f'KILLS:{kills}', True, (0, 255, 255))
+    database.DataBase.save_result(akk, exp, lvlp, kills, dang)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
