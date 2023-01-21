@@ -26,27 +26,24 @@ class DataBase:
             self.con.commit()
         return True
 
-    def register(self, nickname, password):
-        result = self.request("SELECT nickname FROM accounts WHERE nickname = ?", params=[nickname])
-        if len(result) != 0:
-            return 0
-        self.request("INSERT INTO accounts (nickname, password) VALUES (?, ?)", params=[nickname, password],
-                            commit=True)
-        self.nickname = nickname
-        return True
-
     def login(self, nickname, password):
-        result = self.request("SELECT nickname FROM accounts WHERE nickname = ? AND password = ?",
-                              params=[nickname, password])
+        result = self.request("SELECT nickname, password FROM accounts WHERE nickname = ?", params=[nickname])
         if len(result) == 0:
-            return 0
-        else:
+            self.request("INSERT INTO accounts (nickname, password) VALUES (?, ?)", params=[nickname, password],
+                         commit=True)
             self.nickname = nickname
+        else:
+            if result[0][1] == password:
+                self.nickname = nickname
+            else:
+                return False
         return True
 
-    def changepassword(self, newpassword):
-        self.request("UPDATE accounts SET password = ?",
-                              params=[newpassword])
+    def change_password(self, newpassword, newpassword2):
+        if newpassword2 != newpassword:
+            return False
+        else:
+            self.request("UPDATE accounts SET password = ?", params=[newpassword])
         return True
 
     def save_result(self, xp, lvl, kills, floor):
