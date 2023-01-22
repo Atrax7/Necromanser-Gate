@@ -6,6 +6,7 @@ class DataBase:
     def __init__(self):
         self.nickname = None
         self.data = []
+        self.level = []
         try:
             self.con = sqlite3.connect("data/database.db")
             self.cur = self.con.cursor()
@@ -28,18 +29,20 @@ class DataBase:
         return True
 
     def login(self, nickname, password):
+        if len(nickname) <= 0 and len(password) <= 0:
+            return 1
         result = self.request("SELECT * FROM accounts WHERE nickname = ?", params=[nickname])
         if len(result) == 0:
             self.request("INSERT INTO accounts (nickname, password) VALUES (?, ?)", params=[nickname, password],
                          commit=True)
             self.nickname = nickname
             self.data = [0, 1, 0, 0]
-            return 2
+            return 3
         else:
             if result[0][2] == password:
                 self.nickname = nickname
                 self.data = [result[0][3], result[0][4], result[0][5], result[0][6]]
-                return 1
+                return 2
         return 0
 
     def change_password(self, newpassword, newpassword2):
@@ -50,6 +53,7 @@ class DataBase:
         return True
 
     def save_result(self, xp, lvl, kills, floor):
+        self.data = [xp, lvl, kills, floor]
         self.request("UPDATE accounts SET xp = ?, lvl = ?, kills = ?, floor = ? WHERE nickname = ?",
                      params=[xp, lvl, kills, floor, self.nickname], commit=True)
         return True

@@ -1,12 +1,13 @@
 import os
 import sys
-
+import time
 import pygame
 import random
 import database
 
 pygame.init()
-size = width, height = 1280, 960
+pygame.mixer.init()
+size = 1280, 960
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
@@ -14,6 +15,8 @@ tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 sk_group = pygame.sprite.Group()
 playerr = 0
+
+sounds = {}
 
 health = 100
 lvlp = 1
@@ -28,7 +31,7 @@ pygame.mouse.set_visible(False)
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
-        print(f"ERROR | Файл с изображением '{fullname}' не найден!")
+        print(f"ERROR | Файл изображения '{fullname}' не найден!")
         sys.exit()
     image = pygame.image.load(fullname)
     if colorkey is not None:
@@ -42,8 +45,38 @@ def load_image(name, colorkey=None):
 
 
 def terminate():
+    playsound('exit.mp3')
+    time.sleep(1)
     pygame.quit()
     sys.exit()
+
+
+def fontrender(text, size=40, pos=(0, 0)):
+    if pos != (0, 0):
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), size).render(
+            text,
+            True, (0, 255, 255)), pos)
+    else:
+        return pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), size).render(text, True, (0, 255, 255))
+
+
+def background():
+    screen.fill((0, 0, 0))
+    pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+    fontrender('NECROMANCER GATE', 60, (260, 100))
+    pygame.mouse.set_visible(False)
+    screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
+    pygame.time.Clock().tick(60)
+
+
+def playsound(name):
+    fullname = os.path.join('data', 'sounds', name)
+    if not os.path.isfile(fullname):
+        print(f"ERROR | Файл звука '{fullname}' не найден!")
+        sys.exit()
+    else:
+        sounds[name] = pygame.mixer.Sound(fullname)
+        sounds[name].play()
 
 
 def akk_profile():
@@ -54,40 +87,23 @@ def akk_profile():
                 terminate()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
-                    if 500 < event.pos[0] < 800 and 700 < event.pos[1] < 850:
+                    if 550 < event.pos[0] < 700 and 700 < event.pos[1] < 850:
+                        playsound('exit.mp3')
                         start_screen()
-        screen.fill((0, 0, 0))
-        pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+        background()
         screen.blit(load_image('ok.png'), (550, 700))
-        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(
-            f'NECROMANCER GATE',
-            True, (0, 255, 255)),
-                    (240, 100))
-        screen.blit(
-            pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(akk.nickname,
-                                                                                       True,
-                                                                                       (0, 255, 255)),
-            (480, 200))
-        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(
-            f'LEVEL: {akk.data[1]} '
-            f'({akk.data[0]} XP)',
-            True, (0, 255, 255)),
-                    (480, 450))
-        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(
-            f'KILLS: {akk.data[2]}',
-            True, (0, 255, 255)),
-                    (480, 500))
-        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(
-            f'FLOOR: {akk.data[3]}',
-            True, (0, 255, 255)),
-                    (480, 550))
-        pygame.mouse.set_visible(False)
-        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
-        clock.tick(60)
+        fontrender(f'{akk.nickname}`s PROFILE', 50, (400, 200))
+        fontrender(f'LEVEL: {akk.data[1]} ({akk.data[0]} XP)', pos=(450, 450))
+        fontrender(f'KILLS: {akk.data[2]}', pos=(510, 500))
+        fontrender(f'FLOOR: {akk.data[3]}', pos=(510, 550))
         pygame.display.flip()
 
 
 def akk_responce(responce):
+    if responce in [2, 3]:
+        playsound('success.mp3')
+    else:
+        playsound('error.mp3')
     running = True
     while running:
         for event in pygame.event.get():
@@ -95,64 +111,35 @@ def akk_responce(responce):
                 terminate()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
-                    if 500 < event.pos[0] < 800 and 700 < event.pos[1] < 850:
-                        if responce:
+                    if 550 < event.pos[0] < 700 and 700 < event.pos[1] < 850:
+                        if responce in [2, 3]:
+                            playsound('button.mp3')
                             akk_profile()
                         else:
+                            playsound('exit.mp3')
                             akk_but()
-        screen.fill((0, 0, 0))
-        pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+        background()
         screen.blit(load_image('ok.png'), (550, 700))
-        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(
-            f'NECROMANCER GATE',
-            True, (0, 255, 255)),
-                    (240, 100))
-        if responce == 1:
-            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(
-                f'LOGIN SUCCESS!',
-                True, (0, 255, 255)),
-                        (400, 300))
-            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(
-                f'Welcome, ',
-                True, (0, 255, 255)),
-                        (520, 450))
-            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(
-                akk.nickname,
-                True, (0, 255, 255)),
-                        (520, 500))
-        elif responce == 2:
-            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(
-                f'ACCOUNT REGISTERED!',
-                True, (0, 255, 255)),
-                        (300, 300))
-            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(
-                f'Welcome, ',
-                True, (0, 255, 255)),
-                        (520, 450))
-            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(
-                akk.nickname,
-                True, (0, 255, 255)),
-                        (520, 500))
+        if responce in [2, 3]:
+            fontrender(f'Welcome, ', pos=(520, 450))
+            fontrender(akk.nickname, pos=(560, 500))
+
+        if responce == 2:
+            fontrender('LOGIN SUCCESS!', size=50, pos=(400, 250))
+        elif responce == 3:
+            fontrender('ACCOUNT REGISTERED!', size=50, pos=(300, 250))
         else:
-            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(
-                f'ACCESS DENIED',
-                True, (0, 255, 255)),
-                        (400, 300))
-            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(
-                f'Invalid username '
-                f'or password',
-                True, (0, 255, 255)),
-                        (250, 450))
-        pygame.mouse.set_visible(False)
-        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
-        clock.tick(60)
+            fontrender('ACCESS DENIED!', size=50, pos=(370, 250))
+            if responce == 0:
+                fontrender('Invalid username or password!', pos=(250, 450))
+            elif responce == 1:
+                fontrender('Empty username or password!', pos=(250, 450))
         pygame.display.flip()
 
 
 def akk_but():
     if akk.nickname:
         akk_profile()
-    clock = pygame.time.Clock()
     input_box = pygame.Rect(520, 530, 500, 100)
     input_box1 = pygame.Rect(520, 380, 500, 100)
     color_inactive = pygame.Color(0, 255, 255)
@@ -173,6 +160,7 @@ def akk_but():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     if 920 < event.pos[0] < 1220 and 730 < event.pos[1] < 880:
+                        playsound('exit.mp3')
                         start_screen()
                     if 750 < event.pos[0] < 900 and 730 < event.pos[1] < 880:
                         akk_responce(akk.login(text_1, text))
@@ -208,34 +196,20 @@ def akk_but():
                             event.unicode = ''
                         text_1 += event.unicode
 
-        screen.fill((0, 0, 0))
-        pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+        background()
         screen.blit(load_image('exit.png'), (920, 730))
         screen.blit(load_image('ok.png'), (750, 730))
-        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(
-            f'NECROMANCER GATE',
-            True,
-            (0, 255, 255)),
-                    (240, 100))
-        screen.blit(
-            pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'SIGN IN',
-                                                                                       True,
-                                                                                       (0, 255, 255)),
-            (500, 250))
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
-        screen.blit(my_font.render(f'USERNAME:', True, (0, 255, 255)), (250, 400))
-        screen.blit(my_font.render(f'PASSWORD:', True, (0, 255, 255)), (250, 550))
-        screen.blit(my_font.render(text, True, (0, 255, 255)), (input_box.x + 15, input_box.y + 15))
-        screen.blit(my_font.render(text_1, True, (0, 255, 255)),
-                    (input_box1.x + 15, input_box1.y + 15))
+        fontrender('SING IN', 50, (500, 250))
+        fontrender(f'USERNAME:', pos=(250, 400))
+        fontrender(f'PASSWORD:', pos=(250, 550))
+        fontrender(text, pos=(input_box.x + 15, input_box.y + 15))
+        fontrender(text_1, pos=(input_box1.x + 15, input_box1.y + 15))
         pygame.draw.rect(screen, color, input_box, 10)
         pygame.draw.rect(screen, color1, input_box1, 10)
-        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
         pygame.display.flip()
-        clock.tick(60)
 
 
-def res_but():
+def top_but():
     global playerr, health, lvlp, exp, power, dang, kills
     running = True
     while running:
@@ -245,52 +219,38 @@ def res_but():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     if 920 < event.pos[0] < 1220 and 730 < event.pos[1] < 880:
+                        playsound('exit.mp3')
                         return
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
         top = akk.get_top()
 
-        emptytext = my_font.render(f'-', True, (0, 255, 255))
-
-        text3 = emptytext
-        text4 = emptytext
-        text5 = emptytext
-        text6 = emptytext
-        text7 = emptytext
+        text3 = fontrender('I       -')
+        text4 = fontrender('II      -')
+        text5 = fontrender('III     -')
+        text6 = fontrender('IV      -')
+        text7 = fontrender('V       -')
 
         if len(top) >= 1:
-            text3 = my_font.render(f'{top[0][0]}   LEVEL:{top[0][1]}', True, (0, 255, 255))
+            text3 = fontrender(f'I      {top[0][0]}  |  {top[0][1]} LVL')
 
         if len(top) >= 2:
-            text4 = my_font.render(f'{top[1][0]}   LEVEL:{top[1][1]}', True, (0, 255, 255))
+            text4 = fontrender(f'II     {top[1][0]}  |  {top[1][1]} LVL')
 
         if len(top) >= 3:
-            text5 = my_font.render(f'{top[2][0]}   LEVEL:{top[2][1]}', True, (0, 255, 255))
+            text5 = fontrender(f'III    {top[2][0]}  |  {top[2][1]} LVL')
 
         if len(top) >= 4:
-            text6 = my_font.render(f'{top[3][0]}   LEVEL:{top[3][1]}', True, (0, 255, 255))
+            text6 = fontrender(f'IV     {top[3][0]}  |  {top[3][1]} LVL')
 
         if len(top) >= 5:
-            text7 = my_font.render(f'{top[4][0]}   LEVEL:{top[4][1]}', True, (0, 255, 255))
-        screen.fill((0, 0, 0))
-        pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+            text7 = fontrender(f'V      {top[4][0]}  |  {top[4][1]} LVL')
+        background()
         screen.blit(load_image('exit.png'), (920, 730))
-        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(
-            f'NECROMANCER GATE',
-            True,
-            (0, 255, 255)),
-                    (240, 100))
-        screen.blit(
-            pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'STATISTICS:',
-                                                                                       True,
-                                                                                       (0, 255, 255)),
-            (100, 200))
-        screen.blit(text3, (100, 300))
-        screen.blit(text4, (100, 400))
-        screen.blit(text5, (100, 500))
-        screen.blit(text6, (100, 600))
-        screen.blit(text7, (100, 700))
-        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
-        clock.tick(60)
+        fontrender('LEADERBOARD', 50, (400, 200))
+        screen.blit(text3, (150, 300))
+        screen.blit(text4, (150, 400))
+        screen.blit(text5, (150, 500))
+        screen.blit(text6, (150, 600))
+        screen.blit(text7, (150, 700))
         pygame.display.flip()
 
 
@@ -306,6 +266,9 @@ def start_screen():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     if 500 < event.pos[0] < 800 and 300 < event.pos[1] < 450:
+                        akk.level = None
+                        playsound('start.mp3')
+                        time.sleep(1)
                         playerr = 0
                         health = 100
                         lvlp = 1
@@ -315,28 +278,25 @@ def start_screen():
                         kills = 0
                         main_game()
                     if 500 < event.pos[0] < 800 and 500 < event.pos[1] < 650:
-                        res_but()
+                        playsound('button.mp3')
+                        top_but()
                     if 60 < event.pos[0] < 210 and 730 < event.pos[1] < 880:
+                        playsound('button.mp3')
                         akk_but()
                     if 500 < event.pos[0] < 800 and 700 < event.pos[1] < 850:
+                        playsound('exit.mp3')
                         terminate()
-        screen.fill((0, 0, 0))
-        pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+        background()
         screen.blit(load_image('play.png'), (480, 300))
-        screen.blit(load_image('stat.png'), (480, 500))
+        screen.blit(load_image('top.png'), (480, 500))
         screen.blit(load_image('exit.png'), (480, 700))
         screen.blit(load_image('prof.png'), (60, 730))
-        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(
-            f'NECROMANCER GATE',
-            True, (0, 255, 255)),
-                    (240, 100))
-        pygame.mouse.set_visible(False)
-        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
-        clock.tick(60)
         pygame.display.flip()
 
 
 def lose_screen():
+    pygame.mixer.music.pause()
+    playsound('lose.mp3')
     running = True
     sp = pygame.sprite.Group()
     gg = pygame.sprite.Sprite(sp)
@@ -352,26 +312,37 @@ def lose_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                pygame.mixer.music.pause()
+                playsound('exit.mp3')
                 start_screen()
         while al < 255:
             gg.image.set_alpha(al + 1)
             al += 1
             sp.draw(screen)
-            my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
-            screen.blit(my_font.render(f'DANGEON: {dang}', True, (0, 255, 255)), (550, 600))
-            screen.blit(my_font.render(f'LEVEL: {lvlp}', True, (0, 255, 255)), (550, 660))
-            screen.blit(my_font.render(f'KILLS: {kills}', True, (0, 255, 255)), (550, 720))
+            fontrender(f'DANGEON: {dang}', pos=(525, 600))
+            fontrender(f'LEVEL: {lvlp}', pos=(550, 660))
+            fontrender(f'KILLS: {kills}', pos=(550, 720))
             pygame.display.flip()
 
 
 def rand_level():
     global exp, dang
+    pygame.mixer.music.pause()
     exp += 1
     levelUp()
-    lvl = random.choice(('map.txt', 'map1.txt', 'map2.txt', 'map3.txt', 'map4.txt'))
+    levels = ['map.txt', 'map1.txt', 'map2.txt', 'map3.txt', 'map4.txt']
+    if akk.level and akk.level != 'map5.txt':
+        levels.remove(akk.level)
+        playsound('nextlevel.mp3')
+    levels = tuple(levels)
+    lvl = random.choice(levels)
     if dang % 5 == 0:
+        pygame.mixer.music.load("data/boss_music.mp3")
         lvl = 'map5.txt'
+    else:
+        pygame.mixer.music.load("data/castle.mp3")
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.2)
+    akk.level = lvl
     return load_level(lvl)
 
 
@@ -473,6 +444,7 @@ class Skeletb(pygame.sprite.Sprite):
 def levelUp():
     global exp, lvlp, health, power
     if exp >= lvlp * 5:
+        playsound('levelup.mp3')
         exp = 0
         health += 30 * lvlp
         lvlp += 1
@@ -489,7 +461,7 @@ def levelUp():
             screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 80).render(
                 f'*LEVEL UP*', True,
                 (0, 255, 255)),
-                        (400, 40))
+                (400, 40))
             clock.tick(60)
             pygame.display.flip()
 
@@ -508,15 +480,18 @@ def fight():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     if 300 < event.pos[0] < 450 and 800 < event.pos[1] < 875:
+                        playsound('hit.mp3')
                         sk_h -= random.randint(0, power)
                         health -= random.randint(0, 6 - defend + int(lvlp * 1.7))
                         defend -= 1
                     if 550 < event.pos[0] < 700 and 800 < event.pos[1] < 875:
+                        playsound('def.mp3')
                         defend = lvlp
                         health -= random.randint(0, 7 - defend + int(lvlp * 1.7))
                         defend -= 1
                     if 800 < event.pos[0] < 950 and 800 < event.pos[1] < 875:
                         if random.randint(0, 3) == 1:
+                            playsound('escape.mp3')
                             return 2
                         health -= random.randint(0, 6 - defend + int(lvlp * 1.7))
                         defend -= 1
@@ -528,6 +503,7 @@ def fight():
             kills += 1
             exp += 4
             levelUp()
+            playsound('kill.mp3')
             return 1
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (150, 600, 980, 300), 10)
@@ -536,11 +512,11 @@ def fight():
         screen.blit(load_image('def.png'), (550, 800))
         screen.blit(load_image('escape.png'), (800, 800))
         my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 30)
-        screen.blit(my_font.render(f'HP:{health}', True, (0, 255, 255)), (200, 620))
-        screen.blit(my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255)), (420, 620))
-        screen.blit(my_font.render(f'EXP:{exp}', True, (0, 255, 255)), (640, 620))
-        screen.blit(my_font.render(f'POWER:{power}', True, (0, 255, 255)), (860, 620))
-        screen.blit(my_font.render(f'SKELET:{sk_h} / 20', True, (0, 255, 255)), (530, 170))
+        screen.blit(my_font.render(f'HP: {health}', True, (0, 255, 255)), (200, 620))
+        screen.blit(my_font.render(f'LEVEL: {lvlp}', True, (0, 255, 255)), (420, 620))
+        screen.blit(my_font.render(f'EXP: {exp}', True, (0, 255, 255)), (640, 620))
+        screen.blit(my_font.render(f'POWER: {power}', True, (0, 255, 255)), (860, 620))
+        screen.blit(my_font.render(f'SKELET: {sk_h} / 20', True, (0, 255, 255)), (530, 170))
         pygame.mouse.set_visible(False)
         screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
         clock.tick(60)
@@ -559,14 +535,17 @@ def fight_b():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     if 300 < event.pos[0] < 450 and 800 < event.pos[1] < 875:
+                        playsound('hit_boss.mp3')
                         sk_h -= random.randint(0, power)
                         health -= random.randint(0, 8 - defend + int(lvlp * 2))
                         defend -= 1
                     if 550 < event.pos[0] < 700 and 800 < event.pos[1] < 875:
+                        playsound('def.mp3')
                         defend = lvlp
                         health -= random.randint(0, 9 - defend + int(lvlp * 2))
                         defend -= 1
                     if 800 < event.pos[0] < 950 and 800 < event.pos[1] < 875:
+                        playsound('escape.mp3')
                         if random.randint(0, 5) == 1:
                             return 2
                         health -= random.randint(0, 8 - defend + int(lvlp * 2))
@@ -574,11 +553,13 @@ def fight_b():
                     if defend < 0:
                         defend = 0
         if health <= 0:
+            playsound('dead_by_boss.mp3')
             return 0
         if sk_h <= 0:
             kills += 1
             exp += 6 * (dang / 5)
             levelUp()
+            playsound('kill_boss.mp3')
             return 1
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (150, 600, 980, 300), 10)
@@ -614,8 +595,6 @@ def main_game():
     level = rand_level()
     player, sk, x, y, x1, y1 = generate_level(level)
     running = True
-    pygame.mixer.music.load("data/castle.mp3")
-    pygame.mixer.music.play(-1)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -624,6 +603,7 @@ def main_game():
                 moves = pygame.key.get_pressed()
                 if moves[pygame.K_w]:
                     if level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '/':
+                        playsound('away.mp3')
                         lose_screen()
                     elif level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '$':
                         dang += 1
@@ -647,6 +627,7 @@ def main_game():
 
                 elif moves[pygame.K_s]:
                     if level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '/':
+                        playsound('away.mp3')
                         lose_screen()
                     elif level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '$':
                         dang += 1
@@ -670,6 +651,7 @@ def main_game():
 
                 elif moves[pygame.K_a]:
                     if level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '/':
+                        playsound('away.mp3')
                         lose_screen()
                     elif level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '$':
                         dang += 1
@@ -694,6 +676,7 @@ def main_game():
 
                 elif moves[pygame.K_d]:
                     if level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '/':
+                        playsound('away.mp3')
                         lose_screen()
                     elif level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '$':
                         dang += 1
