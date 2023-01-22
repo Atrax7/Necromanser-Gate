@@ -276,6 +276,9 @@ def start_screen():
                         power = 5
                         dang = 1
                         kills = 0
+                        pygame.mixer.music.load("data/castle.mp3")
+                        pygame.mixer.music.play(-1)
+                        pygame.mixer.music.set_volume(0.2)
                         main_game()
                     if 500 < event.pos[0] < 800 and 500 < event.pos[1] < 650:
                         playsound('button.mp3')
@@ -326,7 +329,6 @@ def lose_screen():
 
 def rand_level():
     global exp, dang
-    pygame.mixer.music.pause()
     exp += 1
     levelUp()
     levels = ['map.txt', 'map1.txt', 'map2.txt', 'map3.txt', 'map4.txt']
@@ -337,11 +339,13 @@ def rand_level():
     lvl = random.choice(levels)
     if dang % 5 == 0:
         pygame.mixer.music.load("data/boss_music.mp3")
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.2)
         lvl = 'map5.txt'
-    else:
+    elif (dang - 1) % 5 == 0:
         pygame.mixer.music.load("data/castle.mp3")
-    pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.2)
     akk.level = lvl
     return load_level(lvl)
 
@@ -535,7 +539,7 @@ def fight_b():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     if 300 < event.pos[0] < 450 and 800 < event.pos[1] < 875:
-                        playsound('hit_boss.mp3')
+                        playsound('hit.mp3')
                         sk_h -= random.randint(0, power)
                         health -= random.randint(0, 8 - defend + int(lvlp * 2))
                         defend -= 1
