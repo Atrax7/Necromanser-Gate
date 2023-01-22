@@ -61,7 +61,7 @@ def akk_profile():
         screen.blit(load_image('ok.png'), (550, 700))
         screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
                                                                                                True, (0, 255, 255)),
-                    (250, 100))
+                    (240, 100))
         screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(akk.nickname,
                                                                                                    True, (0, 255, 255)),
                         (480, 200))
@@ -99,7 +99,7 @@ def akk_responce(responce):
         screen.blit(load_image('ok.png'), (550, 700))
         screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
                                                                                                True, (0, 255, 255)),
-                    (250, 100))
+                    (240, 100))
         if responce == 1:
             screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'LOGIN SUCCESS!',
                                                                                                    True, (0, 255, 255)),
@@ -200,7 +200,7 @@ def akk_but():
         screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
                                                                                                True,
                                                                                                (0, 255, 255)),
-                    (250, 100))
+                    (240, 100))
         screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'SIGN IN',
                                                                                                True,
                                                                                                (0, 255, 255)),
@@ -259,7 +259,7 @@ def res_but():
         screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
                                                                                                True,
                                                                                                (0, 255, 255)),
-                    (250, 100))
+                    (240, 100))
         screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'STATISTICS:',
                                                                                                True,
                                                                                                (0, 255, 255)),
@@ -308,7 +308,7 @@ def start_screen():
         screen.blit(load_image('prof.png'), (60, 730))
         screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
                                                                                                True, (0, 255, 255)),
-                    (250, 100))
+                    (240, 100))
         pygame.mouse.set_visible(False)
         screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
         clock.tick(60)
