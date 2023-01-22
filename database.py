@@ -30,7 +30,6 @@ class DataBase:
     def login(self, nickname, password):
         result = self.request("SELECT * FROM accounts WHERE nickname = ?", params=[nickname])
         if len(result) == 0:
-            print(result)
             self.request("INSERT INTO accounts (nickname, password) VALUES (?, ?)", params=[nickname, password],
                          commit=True)
             self.nickname = nickname
