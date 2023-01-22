@@ -34,13 +34,13 @@ class DataBase:
                          commit=True)
             self.nickname = nickname
             self.data = [0, 1, 0, 0]
-            return True
+            return 2
         else:
             if result[0][2] == password:
                 self.nickname = nickname
                 self.data = [result[0][3], result[0][4], result[0][5], result[0][6]]
-                return True
-        return False
+                return 1
+        return 0
 
     def change_password(self, newpassword, newpassword2):
         if newpassword2 != newpassword:

@@ -100,10 +100,20 @@ def akk_responce(responce):
         screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
                                                                                                True, (0, 255, 255)),
                     (250, 100))
-        if responce:
-            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'LOGIN SUCCESS',
+        if responce == 1:
+            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'LOGIN SUCCESS!',
                                                                                                    True, (0, 255, 255)),
                         (400, 300))
+            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(f'Welcome, ',
+                                                                                                   True, (0, 255, 255)),
+                        (520, 450))
+            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(akk.nickname,
+                                                                                                   True, (0, 255, 255)),
+                        (520, 500))
+        elif responce == 2:
+            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'ACCOUNT REGISTERED!',
+                                                                                                   True, (0, 255, 255)),
+                        (300, 300))
             screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(f'Welcome, ',
                                                                                                    True, (0, 255, 255)),
                         (520, 450))
@@ -191,7 +201,7 @@ def akk_but():
                                                                                                True,
                                                                                                (0, 255, 255)),
                     (250, 100))
-        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'SIGN IN:',
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'SIGN IN',
                                                                                                True,
                                                                                                (0, 255, 255)),
                     (500, 250))
