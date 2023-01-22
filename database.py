@@ -5,6 +5,7 @@ import sys
 class DataBase:
     def __init__(self):
         self.nickname = None
+        self.data = []
         try:
             self.con = sqlite3.connect("data/database.db")
             self.cur = self.con.cursor()
@@ -27,17 +28,20 @@ class DataBase:
         return True
 
     def login(self, nickname, password):
-        result = self.request("SELECT nickname, password FROM accounts WHERE nickname = ?", params=[nickname])
+        result = self.request("SELECT * FROM accounts WHERE nickname = ?", params=[nickname])
         if len(result) == 0:
+            print(result)
             self.request("INSERT INTO accounts (nickname, password) VALUES (?, ?)", params=[nickname, password],
                          commit=True)
             self.nickname = nickname
+            self.data = [0, 1, 0, 0]
+            return True
         else:
-            if result[0][1] == password:
+            if result[0][2] == password:
                 self.nickname = nickname
-            else:
-                return False
-        return True
+                self.data = [result[0][3], result[0][4], result[0][5], result[0][6]]
+                return True
+        return False
 
     def change_password(self, newpassword, newpassword2):
         if newpassword2 != newpassword:

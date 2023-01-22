@@ -1,5 +1,6 @@
 import os
 import sys
+
 import pygame
 import random
 import database
@@ -45,7 +46,87 @@ def terminate():
     sys.exit()
 
 
+def akk_profile():
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed()[0]:
+                    if 500 < event.pos[0] < 800 and 700 < event.pos[1] < 850:
+                        start_screen()
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+        screen.blit(load_image('ok.png'), (550, 700))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
+                                                                                               True, (0, 255, 255)),
+                    (250, 100))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(akk.nickname,
+                                                                                                   True, (0, 255, 255)),
+                        (480, 200))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(f'LEVEL: {akk.data[1]} '
+                                                                                               f'({akk.data[0]} XP)',
+                                                                                                   True, (0, 255, 255)),
+                        (480, 450))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(f'KILLS: {akk.data[2]}',
+                                                                                                   True, (0, 255, 255)),
+                        (480, 500))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(f'FLOOR: {akk.data[3]}',
+                                                                                               True, (0, 255, 255)),
+                    (480, 550))
+        pygame.mouse.set_visible(False)
+        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
+        clock.tick(60)
+        pygame.display.flip()
+
+
+def akk_responce(responce):
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed()[0]:
+                    if 500 < event.pos[0] < 800 and 700 < event.pos[1] < 850:
+                        if responce:
+                            akk_profile()
+                        else:
+                            akk_but()
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
+        screen.blit(load_image('ok.png'), (550, 700))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
+                                                                                               True, (0, 255, 255)),
+                    (250, 100))
+        if responce:
+            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'LOGIN SUCCESS',
+                                                                                                   True, (0, 255, 255)),
+                        (400, 300))
+            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(f'Welcome, ',
+                                                                                                   True, (0, 255, 255)),
+                        (520, 450))
+            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(akk.nickname,
+                                                                                                   True, (0, 255, 255)),
+                        (520, 500))
+        else:
+            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'ACCESS DENIED',
+                                                                                                   True, (0, 255, 255)),
+                        (400, 300))
+            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40).render(f'Invalid username '
+                                                                                                   f'or password',
+                                                                                                   True, (0, 255, 255)),
+                        (250, 450))
+        pygame.mouse.set_visible(False)
+        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
+        clock.tick(60)
+        pygame.display.flip()
+
+
 def akk_but():
+    if akk.nickname:
+        akk_profile()
     clock = pygame.time.Clock()
     input_box = pygame.Rect(520, 530, 500, 100)
     input_box1 = pygame.Rect(520, 380, 500, 100)
@@ -67,10 +148,9 @@ def akk_but():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     if 920 < event.pos[0] < 1220 and 730 < event.pos[1] < 880:
-                        return
+                        start_screen()
                     if 750 < event.pos[0] < 900 and 730 < event.pos[1] < 880:
-                        if database.DataBase.login(akk, text_1, text):
-                            return
+                        akk_responce(akk.login(text_1, text))
                 if input_box.collidepoint(event.pos):
                     active = not active
                 else:
@@ -85,7 +165,6 @@ def akk_but():
             if event.type == pygame.KEYDOWN:
                 if active:
                     if event.key == pygame.K_RETURN:
-                        print(text)
                         text = ''
                     elif event.key == pygame.K_BACKSPACE:
                         text = text[:-1]
@@ -96,7 +175,6 @@ def akk_but():
 
                 if active1:
                     if event.key == pygame.K_RETURN:
-                        print(text_1)
                         text_1 = ''
                     elif event.key == pygame.K_BACKSPACE:
                         text_1 = text_1[:-1]
@@ -105,31 +183,26 @@ def akk_but():
                             event.unicode = ''
                         text_1 += event.unicode
 
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60)
-        text1 = my_font.render(f'NECROMANCER GATE', True, (0, 255, 255))
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50)
-        text2 = my_font.render(f'SIGN IN:', True, (0, 255, 255))
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
-        text3 = my_font.render(f'USERNAME:', True, (0, 255, 255))
-        text4 = my_font.render(f'PASSWORD:', True, (0, 255, 255))
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
-        but1 = load_image('exit.png')
-        but2 = load_image('ok.png')
-        screen.blit(but1, (920, 730))
-        screen.blit(but2, (750, 730))
-        screen.blit(text1, (300, 100))
-        screen.blit(text2, (550, 250))
-        screen.blit(text3, (250, 400))
-        screen.blit(text4, (250, 550))
-        txt_surface = my_font.render(text, True, (0, 255, 255))
-        screen.blit(txt_surface, (input_box.x + 15, input_box.y + 15))
-        txt_surface = my_font.render(text_1, True, (0, 255, 255))
-        screen.blit(txt_surface, (input_box1.x + 15, input_box1.y + 15))
+        screen.blit(load_image('exit.png'), (920, 730))
+        screen.blit(load_image('ok.png'), (750, 730))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
+                                                                                               True,
+                                                                                               (0, 255, 255)),
+                    (250, 100))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'SIGN IN:',
+                                                                                               True,
+                                                                                               (0, 255, 255)),
+                    (500, 250))
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
+        screen.blit(my_font.render(f'USERNAME:', True, (0, 255, 255)), (250, 400))
+        screen.blit(my_font.render(f'PASSWORD:', True, (0, 255, 255)), (250, 550))
+        screen.blit(my_font.render(text, True, (0, 255, 255)), (input_box.x + 15, input_box.y + 15))
+        screen.blit(my_font.render(text_1, True, (0, 255, 255)), (input_box1.x + 15, input_box1.y + 15))
         pygame.draw.rect(screen, color, input_box, 10)
         pygame.draw.rect(screen, color1, input_box1, 10)
-        cursor = load_image('curs.png')
-        screen.blit(cursor, pygame.mouse.get_pos())
+        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
         pygame.display.flip()
         clock.tick(60)
 
@@ -145,10 +218,6 @@ def res_but():
                 if pygame.mouse.get_pressed()[0]:
                     if 920 < event.pos[0] < 1220 and 730 < event.pos[1] < 880:
                         return
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60)
-        text1 = my_font.render(f'NECROMANCER GATE', True, (0, 255, 255))
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50)
-        text2 = my_font.render(f'STATISTICS:', True, (0, 255, 255))
         my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
         top = akk.get_top()
 
@@ -160,7 +229,7 @@ def res_but():
         text6 = emptytext
         text7 = emptytext
 
-        if top[0][1] != '0':
+        if len(top) >= 1:
             text3 = my_font.render(f'{top[0][0]}   LEVEL:{top[0][1]}', True, (0, 255, 255))
 
         if len(top) >= 2:
@@ -176,17 +245,21 @@ def res_but():
             text7 = my_font.render(f'{top[4][0]}   LEVEL:{top[4][1]}', True, (0, 255, 255))
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
-        but3 = load_image('exit.png')
-        screen.blit(but3, (920, 730))
-        screen.blit(text1, (300, 100))
-        screen.blit(text2, (100, 200))
+        screen.blit(load_image('exit.png'), (920, 730))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
+                                                                                               True,
+                                                                                               (0, 255, 255)),
+                    (250, 100))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 50).render(f'STATISTICS:',
+                                                                                               True,
+                                                                                               (0, 255, 255)),
+                    (100, 200))
         screen.blit(text3, (100, 300))
         screen.blit(text4, (100, 400))
         screen.blit(text5, (100, 500))
         screen.blit(text6, (100, 600))
         screen.blit(text7, (100, 700))
-        cursor = load_image('curs.png')
-        screen.blit(cursor, pygame.mouse.get_pos())
+        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
         clock.tick(60)
         pygame.display.flip()
 
@@ -217,22 +290,17 @@ def start_screen():
                         akk_but()
                     if 500 < event.pos[0] < 800 and 700 < event.pos[1] < 850:
                         terminate()
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60)
-        text1 = my_font.render(f'NECROMANCER GATE', True, (0, 255, 255))
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (40, 40, 1200, 860), 10)
-        but1 = load_image('play.png')
-        screen.blit(but1, (500, 300))
-        but2 = load_image('stat.png')
-        screen.blit(but2, (500, 500))
-        but3 = load_image('exit.png')
-        screen.blit(but3, (500, 700))
-        but4 = load_image('prof.png')
-        screen.blit(but4, (60, 730))
-        screen.blit(text1, (300, 100))
+        screen.blit(load_image('play.png'), (480, 300))
+        screen.blit(load_image('stat.png'), (480, 500))
+        screen.blit(load_image('exit.png'), (480, 700))
+        screen.blit(load_image('prof.png'), (60, 730))
+        screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 60).render(f'NECROMANCER GATE',
+                                                                                               True, (0, 255, 255)),
+                    (250, 100))
         pygame.mouse.set_visible(False)
-        cursor = load_image('curs.png')
-        screen.blit(cursor, pygame.mouse.get_pos())
+        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
         clock.tick(60)
         pygame.display.flip()
 
@@ -240,18 +308,13 @@ def start_screen():
 def lose_screen():
     running = True
     sp = pygame.sprite.Group()
-    curs = load_image("gameover.png")
     gg = pygame.sprite.Sprite(sp)
-    gg.image = curs
+    gg.image = load_image("gameover.png")
     gg.rect = gg.image.get_rect()
     gg.rect.x = 0
     gg.rect.y = 0
     al = 0
-    my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
-    text1 = my_font.render(f'DANGEON:{dang}', True, (0, 255, 255))
-    text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
-    text3 = my_font.render(f'KILLS:{kills}', True, (0, 255, 255))
-    database.DataBase.save_result(akk, exp, lvlp, kills, dang)
+    akk.save_result(exp, lvlp, kills, dang)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -264,16 +327,17 @@ def lose_screen():
             gg.image.set_alpha(al + 1)
             al += 1
             sp.draw(screen)
-            screen.blit(text1, (550, 600))
-            screen.blit(text2, (550, 660))
-            screen.blit(text3, (550, 720))
+            my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 40)
+            screen.blit(my_font.render(f'DANGEON: {dang}', True, (0, 255, 255)), (550, 600))
+            screen.blit(my_font.render(f'LEVEL: {lvlp}', True, (0, 255, 255)), (550, 660))
+            screen.blit(my_font.render(f'KILLS: {kills}', True, (0, 255, 255)), (550, 720))
             pygame.display.flip()
 
 
 def rand_level():
     global exp, dang
     exp += 1
-    LevelUp()
+    levelUp()
     lvl = random.choice(('map.txt', 'map1.txt', 'map2.txt', 'map3.txt', 'map4.txt'))
     if dang % 5 == 0:
         lvl = 'map5.txt'
@@ -349,10 +413,10 @@ class Player(pygame.sprite.Sprite):
         self.lf = True
 
     def rot(self, s):
-        if s == True and self.lf == False:
+        if s and not self.lf:
             self.image = pygame.transform.flip(self.image, True, False)
             self.lf = True
-        elif s == False and self.lf == True:
+        elif not s and self.lf:
             self.image = pygame.transform.flip(self.image, True, False)
             self.lf = False
 
@@ -375,7 +439,7 @@ class Skeletb(pygame.sprite.Sprite):
         self.lf = True
 
 
-def LevelUp():
+def levelUp():
     global exp, lvlp, health, power
     if exp >= lvlp * 5:
         exp = 0
@@ -383,9 +447,7 @@ def LevelUp():
         lvlp += 1
         power += 2
         running = True
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 80)
-        text1 = my_font.render(f'*LEVEL UP*', True, (0, 255, 255))
-        database.DataBase.save_result(akk, exp, lvlp, kills, dang)
+        akk.save_result(exp, lvlp, kills, dang)
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -393,7 +455,9 @@ def LevelUp():
                 elif event.type == pygame.KEYDOWN or \
                         event.type == pygame.MOUSEBUTTONDOWN:
                     return
-            screen.blit(text1, (400, 40))
+            screen.blit(pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 80).render(f'*LEVEL UP*', True,
+                                                                                                   (0, 255, 255)),
+                        (400, 40))
             clock.tick(60)
             pygame.display.flip()
 
@@ -431,32 +495,22 @@ def fight():
         if sk_h <= 0:
             kills += 1
             exp += 4
-            LevelUp()
+            levelUp()
             return 1
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 30)
-        text1 = my_font.render(f'HP:{health}', True, (0, 255, 255))
-        text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
-        text3 = my_font.render(f'EXP:{exp}', True, (0, 255, 255))
-        text4 = my_font.render(f'POWER:{power}', True, (0, 255, 255))
-        text5 = my_font.render(f'SKELET:{sk_h} / 20', True, (0, 255, 255))
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (150, 600, 980, 300), 10)
-        sk = load_image('skelet-f.png')
-        screen.blit(sk, (525, 300))
-        but1 = load_image('fight.png')
-        screen.blit(but1, (300, 800))
-        but2 = load_image('def.png')
-        screen.blit(but2, (550, 800))
-        but3 = load_image('escape.png')
-        screen.blit(but3, (800, 800))
-        screen.blit(text1, (200, 620))
-        screen.blit(text2, (420, 620))
-        screen.blit(text3, (640, 620))
-        screen.blit(text4, (860, 620))
-        screen.blit(text5, (530, 170))
+        screen.blit(load_image('skelet-f.png'), (525, 300))
+        screen.blit(load_image('fight.png'), (300, 800))
+        screen.blit(load_image('def.png'), (550, 800))
+        screen.blit(load_image('escape.png'), (800, 800))
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 30)
+        screen.blit(my_font.render(f'HP:{health}', True, (0, 255, 255)), (200, 620))
+        screen.blit(my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255)), (420, 620))
+        screen.blit(my_font.render(f'EXP:{exp}', True, (0, 255, 255)), (640, 620))
+        screen.blit(my_font.render(f'POWER:{power}', True, (0, 255, 255)), (860, 620))
+        screen.blit(my_font.render(f'SKELET:{sk_h} / 20', True, (0, 255, 255)), (530, 170))
         pygame.mouse.set_visible(False)
-        cursor = load_image('curs.png')
-        screen.blit(cursor, pygame.mouse.get_pos())
+        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
         clock.tick(60)
         pygame.display.flip()
 
@@ -492,32 +546,22 @@ def fight_b():
         if sk_h <= 0:
             kills += 1
             exp += 6 * (dang / 5)
-            LevelUp()
+            levelUp()
             return 1
-        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 30)
-        text1 = my_font.render(f'HP:{health}', True, (0, 255, 255))
-        text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
-        text3 = my_font.render(f'EXP:{exp}', True, (0, 255, 255))
-        text4 = my_font.render(f'POWER:{power}', True, (0, 255, 255))
-        text5 = my_font.render(f'SKELET:{sk_h} / {10 * lvlp}', True, (0, 255, 255))
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (0, 255, 255), (150, 600, 980, 300), 10)
-        sk = load_image('skelet-bf.png')
-        screen.blit(sk, (525, 300))
-        but1 = load_image('fight.png')
-        screen.blit(but1, (300, 800))
-        but2 = load_image('def.png')
-        screen.blit(but2, (550, 800))
-        but3 = load_image('escape.png')
-        screen.blit(but3, (800, 800))
-        screen.blit(text1, (200, 620))
-        screen.blit(text2, (420, 620))
-        screen.blit(text3, (640, 620))
-        screen.blit(text4, (860, 620))
-        screen.blit(text5, (530, 170))
+        screen.blit(load_image('skelet-bf.png'), (525, 300))
+        screen.blit(load_image('fight.png'), (300, 800))
+        screen.blit(load_image('def.png'), (550, 800))
+        screen.blit(load_image('escape.png'), (800, 800))
+        my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 30)
+        screen.blit(my_font.render(f'HP:{health}', True, (0, 255, 255)), (200, 620))
+        screen.blit(my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255)), (420, 620))
+        screen.blit(my_font.render(f'EXP:{exp}', True, (0, 255, 255)), (640, 620))
+        screen.blit(my_font.render(f'POWER:{power}', True, (0, 255, 255)), (860, 620))
+        screen.blit(my_font.render(f'SKELET:{sk_h} / {10 * lvlp}', True, (0, 255, 255)), (530, 170))
         pygame.mouse.set_visible(False)
-        cursor = load_image('curs.png')
-        screen.blit(cursor, pygame.mouse.get_pos())
+        screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
         clock.tick(60)
         pygame.display.flip()
 
@@ -656,16 +700,12 @@ def main_game():
                             sk.remove(lt)
                         elif res == 0:
                             lose_screen()
-
-        text1 = my_font.render(f'HP:{health}', True, (0, 255, 255))
-        text2 = my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255))
-        text3 = my_font.render(f'DANGEON:{dang}', True, (0, 255, 255))
         screen.fill((0, 0, 0))
         tiles_group.draw(screen)
         player_group.draw(screen)
-        screen.blit(text1, (11, 11))
-        screen.blit(text2, (11, 44))
-        screen.blit(text3, (11, 77))
+        screen.blit(my_font.render(f'HP:{health}', True, (0, 255, 255)), (11, 11))
+        screen.blit(my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255)), (11, 44))
+        screen.blit(my_font.render(f'DANGEON:{dang}', True, (0, 255, 255)), (11, 77))
         pygame.mouse.set_visible(False)
         cursor = load_image('curs.png')
         screen.blit(cursor, pygame.mouse.get_pos())
