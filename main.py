@@ -92,10 +92,12 @@ def akk_profile():
                         start_screen()
         background()
         screen.blit(load_image('ok.png'), (550, 700))
+        pygame.draw.rect(screen, (0, 255, 255), (355, 340, 220, 320), 10)
+        screen.blit(load_image('gg_ak.png'), (300, 350))
         fontrender(f'{akk.nickname}`s PROFILE', 50, (400, 200))
-        fontrender(f'LEVEL: {akk.data[1]} ({akk.data[0]} XP)', pos=(450, 450))
-        fontrender(f'KILLS: {akk.data[2]}', pos=(510, 500))
-        fontrender(f'FLOOR: {akk.data[3]}', pos=(510, 550))
+        fontrender(f'LEVEL: {akk.data[1]} ({akk.data[0]} XP)', pos=(585, 400))
+        fontrender(f'KILLS: {akk.data[2]}', pos=(585, 450))
+        fontrender(f'FLOOR: {akk.data[3]}', pos=(585, 500))
         pygame.display.flip()
 
 
@@ -386,6 +388,12 @@ def generate_level(level):
             elif level[y][x] == 'b':
                 Tile('empty', x, y)
                 new_sk.append(Skeletb(x, y))
+    clr_x = random.randint(0, 20)
+    clr_y = random.randint(0, 15)
+    while level[clr_y][clr_x] != '.':
+        clr_x = random.randint(1, 14)
+        clr_y = random.randint(1, 14)
+    Tile('cleric', clr_x, clr_y)
     return new_player, new_sk, x, y, x1, y1
 
 
@@ -393,7 +401,8 @@ tile_images = {
     'wall': load_image('wall.png'),
     'empty': load_image('floor.png'),
     'dark': load_image('dark.png'),
-    'portal': load_image('fire.png')
+    'portal': load_image('fire.png'),
+    'cleric': load_image('cleric.png')
 }
 sk_image = load_image('skelet.png')
 skb_image = load_image('skelet_b.png')
@@ -521,6 +530,11 @@ def fight():
         screen.blit(my_font.render(f'EXP: {exp}', True, (0, 255, 255)), (640, 620))
         screen.blit(my_font.render(f'POWER: {power}', True, (0, 255, 255)), (860, 620))
         screen.blit(my_font.render(f'SKELET: {sk_h} / 20', True, (0, 255, 255)), (530, 170))
+        if health <= 40:
+            surf = pygame.Surface((1280, 960))
+            surf.fill((255, 0, 0))
+            surf.set_alpha(40)
+            screen.blit(surf, (0, 0))
         pygame.mouse.set_visible(False)
         screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
         clock.tick(60)
@@ -577,6 +591,11 @@ def fight_b():
         screen.blit(my_font.render(f'EXP:{exp}', True, (0, 255, 255)), (640, 620))
         screen.blit(my_font.render(f'POWER:{power}', True, (0, 255, 255)), (860, 620))
         screen.blit(my_font.render(f'SKELET:{sk_h} / {10 * lvlp}', True, (0, 255, 255)), (530, 170))
+        if health <= 40:
+            surf = pygame.Surface((1280, 960))
+            surf.fill((255, 0, 0))
+            surf.set_alpha(40)
+            screen.blit(surf, (0, 0))
         pygame.mouse.set_visible(False)
         screen.blit(load_image('curs.png'), pygame.mouse.get_pos())
         clock.tick(60)
@@ -594,10 +613,10 @@ def main_game():
     lvlp = 1
     exp = 0
     power = 5
-    screen.fill((0, 0, 0))
     my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 20)
     level = rand_level()
     player, sk, x, y, x1, y1 = generate_level(level)
+    screen.fill((0, 0, 0))
     running = True
     while running:
         for event in pygame.event.get():
@@ -720,13 +739,17 @@ def main_game():
                             sk.remove(lt)
                         elif res == 0:
                             lose_screen()
-        screen.fill((0, 0, 0))
         tiles_group.draw(screen)
         player_group.draw(screen)
         screen.blit(my_font.render(f'HP:{health}', True, (0, 255, 255)), (11, 11))
         screen.blit(my_font.render(f'LEVEL:{lvlp}', True, (0, 255, 255)), (11, 44))
         screen.blit(my_font.render(f'DANGEON:{dang}', True, (0, 255, 255)), (11, 77))
         pygame.mouse.set_visible(False)
+        if health <= 40:
+            surf = pygame.Surface((1280, 960))
+            surf.fill((255, 0, 0))
+            surf.set_alpha(40)
+            screen.blit(surf, (0, 0))
         cursor = load_image('curs.png')
         screen.blit(cursor, pygame.mouse.get_pos())
         clock.tick(60)
