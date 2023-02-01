@@ -297,6 +297,7 @@ def start_screen():
         screen.blit(load_image('exit.png'), (480, 700))
         screen.blit(load_image('prof.png'), (60, 730))
         pygame.display.flip()
+        clock.tick(60)
 
 
 def lose_screen():
@@ -388,13 +389,13 @@ def generate_level(level):
             elif level[y][x] == 'b':
                 Tile('empty', x, y)
                 new_sk.append(Skeletb(x, y))
-    clr_x = random.randint(0, 20)
-    clr_y = random.randint(0, 15)
+    clr_x = random.randint(0, 14)
+    clr_y = random.randint(0, 14)
     while level[clr_y][clr_x] != '.':
         clr_x = random.randint(1, 14)
         clr_y = random.randint(1, 14)
-    Tile('cleric', clr_x, clr_y)
-    return new_player, new_sk, x, y, x1, y1
+    cl = Cleric(clr_x, clr_y)
+    return new_player, new_sk, x, y, x1, y1, cl
 
 
 tile_images = {
@@ -402,8 +403,8 @@ tile_images = {
     'empty': load_image('floor.png'),
     'dark': load_image('dark.png'),
     'portal': load_image('fire.png'),
-    'cleric': load_image('cleric.png')
 }
+cl_image = load_image('cleric.png')
 sk_image = load_image('skelet.png')
 skb_image = load_image('skelet_b.png')
 player_image = load_image('ggs.png')
@@ -440,6 +441,15 @@ class Skelet(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(player_group, all_sprites)
         self.image = sk_image
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.lf = True
+
+
+class Cleric(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(player_group, all_sprites)
+        self.image = cl_image
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
         self.lf = True
@@ -615,7 +625,7 @@ def main_game():
     power = 5
     my_font = pygame.font.Font(os.path.join('data', 'retro-land-mayhem.ttf'), 20)
     level = rand_level()
-    player, sk, x, y, x1, y1 = generate_level(level)
+    player, sk, x, y, x1, y1, cl = generate_level(level)
     screen.fill((0, 0, 0))
     running = True
     while running:
@@ -634,7 +644,7 @@ def main_game():
                             lt.kill()
                         screen.fill((0, 0, 0))
                         level = rand_level()
-                        pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
+                        pl, sk, x, y, player.rect.x, player.rect.y, cl = generate_level(level)
                         player.rect.x *= 64
                         player.rect.y *= 64
                     elif not level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '#':
@@ -658,7 +668,7 @@ def main_game():
                             lt.kill()
                         screen.fill((0, 0, 0))
                         level = rand_level()
-                        pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
+                        pl, sk, x, y, player.rect.x, player.rect.y, cl = generate_level(level)
                         player.rect.x *= 64
                         player.rect.y *= 64
                     elif not level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '#':
@@ -682,7 +692,7 @@ def main_game():
                             lt.kill()
                         screen.fill((0, 0, 0))
                         level = rand_level()
-                        pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
+                        pl, sk, x, y, player.rect.x, player.rect.y, cl = generate_level(level)
                         player.rect.x *= 64
                         player.rect.y *= 64
                     elif not level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '#':
@@ -707,7 +717,7 @@ def main_game():
                             lt.kill()
                         screen.fill((0, 0, 0))
                         level = rand_level()
-                        pl, sk, x, y, player.rect.x, player.rect.y = generate_level(level)
+                        pl, sk, x, y, player.rect.x, player.rect.y, cl = generate_level(level)
                         player.rect.x *= 64
                         player.rect.y *= 64
                     elif not level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '#':
@@ -723,6 +733,14 @@ def main_game():
                                 lose_screen()
                 else:
                     break
+                if cl.rect.x == player.rect.x and cl.rect.y == player.rect.y:
+                    health += 20
+                    screen.blit(my_font.render(f'+20HP', True, (0, 255, 255)), (player.rect.x - 10, player.rect.y - 20))
+                    playsound('success.mp3')
+                    pygame.display.flip()
+                    time.sleep(0.5)
+                    cl.rect.x = -64
+                    cl.rect.y = -64
 
                 for lt in sk:
                     xx, yy = random.randint(-1, 1), random.randint(-1, 1)
