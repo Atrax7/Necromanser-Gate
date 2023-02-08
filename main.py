@@ -640,6 +640,8 @@ def main_game():
                         lose_screen()
                     elif level[int(player.rect.y / 64) - 1][int(player.rect.x / 64)] == '$':
                         dang += 1
+                        cl.rect.x = -64
+                        cl.rect.y = -64
                         for lt in sk:
                             lt.kill()
                         screen.fill((0, 0, 0))
@@ -664,6 +666,8 @@ def main_game():
                         lose_screen()
                     elif level[int(player.rect.y / 64) + 1][int(player.rect.x / 64)] == '$':
                         dang += 1
+                        cl.rect.x = -64
+                        cl.rect.y = -64
                         for lt in sk:
                             lt.kill()
                         screen.fill((0, 0, 0))
@@ -688,6 +692,8 @@ def main_game():
                         lose_screen()
                     elif level[int(player.rect.y / 64)][int(player.rect.x / 64) - 1] == '$':
                         dang += 1
+                        cl.rect.x = -64
+                        cl.rect.y = -64
                         for lt in sk:
                             lt.kill()
                         screen.fill((0, 0, 0))
@@ -713,6 +719,8 @@ def main_game():
                         lose_screen()
                     elif level[int(player.rect.y / 64)][int(player.rect.x / 64) + 1] == '$':
                         dang += 1
+                        cl.rect.x = -64
+                        cl.rect.y = -64
                         for lt in sk:
                             lt.kill()
                         screen.fill((0, 0, 0))
